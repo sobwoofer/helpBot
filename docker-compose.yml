@@ -1,0 +1,70 @@
+version: '3'
+services:
+    nginx:
+        build:
+            context: ./
+            dockerfile: docker/nginx.docker
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/ssl:/etc/nginx/ssl
+        ports:
+            - "8080:443"
+    php-fpm:
+        build:
+            context: ./
+            dockerfile: docker/php-fpm.docker
+        volumes:
+            - ./:/var/www
+        expose:
+            - "9003"
+        environment:
+            DB_PORT: "3306"
+            DB_HOST: "mysql"
+            REDIS_PORT: "6379"
+            REDIS_HOST: "redis"
+            ELASTICSEARCH_HOSTS: "elasticsearch:9200"
+            PHP_IDE_CONFIG: "serverName=docker"
+            XDEBUG_CONFIG: "remote_port=9003 remote_host=172.17.0.1 remote_enable=1"
+    php-cli:
+        build:
+            context: ./
+            dockerfile: docker/php-cli.docker
+        volumes:
+            - ./:/var/www
+        environment:
+            DB_PORT: "3306"
+            DB_HOST: "mysql"
+            REDIS_PORT: "6379"
+            REDIS_HOST: "redis"
+            ELASTICSEARCH_HOSTS: "elasticsearch:9200"
+            PHP_IDE_CONFIG: "serverName=docker"
+            XDEBUG_CONFIG: "remote_port=9003 remote_host=172.17.0.1 remote_enable=1"
+        tty: true
+    mysql:
+        image: mysql:5.7
+        volumes:
+            - ./storage/docker/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "secret"
+            MYSQL_USER: "app"
+            MYSQL_PASSWORD: "secret"
+            MYSQL_DATABASE: "app"
+        ports:
+            - "33061:3306"
+    redis:
+        image: redis:3.0
+        ports:
+            - "63791:6379"
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+        environment:
+            bootstrap.memory_lock: "true"
+            ES_JAVA_OPTS: "-Xms128m -Xmx128m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - ./storage/docker/elasticsearch:/usr/share/elasticsearch/data
+        ports:
+            - "9201:9200"
