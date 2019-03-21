@@ -14,7 +14,16 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::any('{token}/webhook', function () {
+    $update = Telegram::commandsHandler(true);
 
+    var_dump($update);
+    // Commands handler method returns an Update object.
+    // So you can further process $update object
+    // to however you want.
+
+    return 'ok';
+});
 Route::post('{token}/webhook', function () {
     $update = Telegram::commandsHandler(true);
 
