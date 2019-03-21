@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('{token}/webhook', function () {
+Route::post('{token}/webhook', function () {
     $update = Telegram::commandsHandler(true);
 
     var_dump($update);
