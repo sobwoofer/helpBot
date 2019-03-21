@@ -2,9 +2,10 @@
 /public/hot
 /public/storage
 /storage/*.key
-/storage/*
+/storage/docker
 /vendor
 /.idea
+/.well-known
 .env
 .phpunit.result.cache
 Homestead.json
